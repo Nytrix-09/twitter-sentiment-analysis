@@ -1,7 +1,7 @@
 import tweepy,csv,re
 from textblob import TextBlob
 import matplotlib.pyplot as plt
-# text=TextBlob("Vedika is a selfish girl")
+# text=TextBlob("This is a sample text")
 # ans=text.sentiment.polarity
 class SentimentAnalysis:
     def __init__(self):
@@ -10,30 +10,28 @@ class SentimentAnalysis:
 
     def DownloadData(self):
         #login into twitter
-        # ConsumerKey='PxTzTwdntBmkaDHF4lFIlssBe'
-        # ConsumerKeySecret='u6UacpkNRKt2f11jYqGLXyQusg6hRQMqMi5i1cqumwIHjqm55z'
-        # AccessToken='1332598498047393792-KJGCVbVjxYkjzgaD0FIalZooTPAZ4c'
-        # AccessTokenSecret='xQ05bA2oZ7VxNzGGYXbLUQE3xYr0DZHNPJcboqRrdHfFs'
-        ConsumerKey = 'GzwMkpJeUpzfURZCFUpwZA8ak'
-        ConsumerKeySecret = 'B4BXYagArf08fBVboUBLOKVfdLzjE3JhyqIVbno7CMCeku0YQD'
-        AccessToken = '165156783-rcJ3jiSaPpnRryGgE0M1xb8T9pVQcL9TAmRB5WHa'
-        AccessTokenSecret = 'usHZc2ReMXUHJSAQbXf33uPvKkRxbsepPXmUOTfqEj5Fz'
+        #post login to twitter account, apply for a developer account with twitter and then you will have the credentials to enter below
+        ConsumerKey = ''
+        ConsumerKeySecret = ''
+        AccessToken = ''
+        AccessTokenSecret = ''
         auth=tweepy.OAuthHandler(ConsumerKey,ConsumerKeySecret)
         auth.set_access_token(AccessToken,AccessTokenSecret)
         
         api=tweepy.API(auth)
 
-        #user input
+        #User Input here
         SearchTerm= input("Enter key word: ")
         NoOfTweets=int(input("Enter number of tweets: "))
 
-        #Search tweets
+        #Search Tweets (tweepy command)
         self.tweets=tweepy.Cursor(api.search, q = SearchTerm, lang="en").items(NoOfTweets)
 
-        #File handling
+        #File handling, here it makes a "twitter_data.csv" file and writes the result in the file 
         csvfile=open('twitter_data.csv','a')
         csvwriter=csv.writer(csvfile)
         
+        #Defining Paramaters that will help classify tweet sentiment 
         neutral=0
         weakly_positive=0
         moderately_positive=0
@@ -47,25 +45,34 @@ class SentimentAnalysis:
             analysis=TextBlob(tweet.text)
             polarity=analysis.sentiment.polarity
             polarity+=polarity
-
+            
+            #condition for neutral tweet sentiment
             if (analysis.sentiment.polarity==0):
                 neutral+=1
+            #condition for weakly positive tweet sentiment
             elif (analysis.sentiment.polarity>0 and analysis.sentiment.polarity<=0.3):
                 weakly_positive+=1
+            #condition for moderately tweet sentiment
             elif (analysis.sentiment.polarity>0.3 and analysis.sentiment.polarity<=0.6):
                 moderately_positive+=1
+            #condition for strongly positive tweet sentiment
             elif (analysis.sentiment.polarity>0.6 and analysis.sentiment.polarity<=1):
                 strongly_positive+=1
+            #condition for weakly neagtive tweet sentiment
             elif (analysis.sentiment.polarity>=-0.3 and analysis.sentiment.polarity<0):
                 weakly_negative+=1
+            #condition for moderately negative tweet sentiment
             elif (analysis.sentiment.polarity>=-0.6 and analysis.sentiment.polarity<-0.3):
                 moderately_negative+=1
+            #condition for strongly negative tweet sentiment
             elif (analysis.sentiment.polarity>=-1 and analysis.sentiment.polarity<-0.6):
                 strongly_negative+=1
         
+        #Closing the file after writing
         csvwriter.writerow(self.tweetText)
         csvfile.close()   
 
+        #Calculating percentage of each type of tweet sentiment for the focus keyword
         neutral= self.percentage(neutral, NoOfTweets)
         weakly_positive=self.percentage(weakly_positive, NoOfTweets)
         moderately_positive=self.percentage(moderately_positive, NoOfTweets)
@@ -90,7 +97,8 @@ class SentimentAnalysis:
             print("Moderately Negative")
         elif (polarity>=-1 and polarity<-0.6):
             print("Strongly Negative")
-
+        
+        #Report with plain Numerical Values
         print("\n\n Report With Values: ======> ")
 
         print(str(neutral)+" % people are neutral")
@@ -100,18 +108,21 @@ class SentimentAnalysis:
         print(str(weakly_negative)+" % people are weakly_negative")
         print(str(moderately_negative)+" % people are moderately_negative")
         print(str(strongly_negative)+" % people are strongly_negative")
-
+        
+        #Plotting by calling the plotPieChart() class after the result of the focus keyword's sentiment is output.
         self.plotPieChart(neutral,weakly_positive,moderately_positive,strongly_positive,weakly_negative,moderately_negative,strongly_negative,SearchTerm,NoOfTweets)
 
 
-
+    #To clean the focus keyword input by the user 
     def cleanText(self,tweet):
         return ' '.join(re.sub("(@[A-Za-z0-9]+) | ([^0-9A-Za-z \t]) | (\w +:\ / \ / \S +)"," ",tweet).split()) #all characters starting with capital, small or with numbers and even links will be accessed
 
+    #To calculate the percentage of each sentiment found for the keyword 
     def percentage(self,part,total):
         count=100 * float(part)/float(total)
         return format(count,'.2f')
 
+    #Defining pie chart class and how plotting is carried out with their colors etc.
     def plotPieChart(self,neutral,weakly_positive,moderately_positive,strongly_positive,weakly_negative,moderately_negative,strongly_negative,SearchTerm,NoOfTweets):
         labels= [
             "neutral "+str(neutral)+" %",
@@ -144,6 +155,7 @@ class SentimentAnalysis:
         plt.tight_layout()
         plt.show()
 
+#Main to run the program
 if __name__ == "__main__":
     sa=SentimentAnalysis()
     sa.DownloadData()
