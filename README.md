@@ -8,3 +8,8 @@ A python script made by utilizing the Tweepy API by twitter. This is a project I
 + Weakly Negative
 + Moderately Negative
 + Strongly Negative
+
+
+Here's a Sample Output of the script :
+
+![sample-output-picture](https://github.com/Nytrix-09/twitter-sentiment-analysis/blob/main/tsa-3.png)
