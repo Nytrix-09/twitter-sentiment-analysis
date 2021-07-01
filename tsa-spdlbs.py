@@ -150,7 +150,7 @@ class SentimentAnalysis:
 
         patches, texts = plt.pie(sizes,colors=colors,startangle=90)
         plt.legend(patches,labels,loc="best")
-        plt.title("People reaction in "+str(SearchTerm)+" by analysing "+str(NoOfTweets)+" Tweets.")
+        plt.title("Sentiment Analysis of the Word " + str(SearchTerm) + " after analysing "+str(NoOfTweets)+" Tweets")
         plt.axis("equal")
         plt.tight_layout()
         plt.show()
